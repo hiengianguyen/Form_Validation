@@ -1,57 +1,80 @@
 function Validator(option) {
+  function getParent(element, selector) {
+    while (element.parentElement) {
+      if (element.parentElement.matches(selector)) {
+        return element.parentElement;
+      }
+      element = element.parentElement;
+    }
+  }
 
-  var selectorRules = {}
+  var selectorRules = {};
 
   function validate(inputElement, rule) {
-    var errorElement =
-      inputElement.parentElement.querySelector(".form-message");
+    var errorElement = getParent(
+      inputElement,
+      option.formGroupSelector
+    ).querySelector(".form-message");
     var errorMessage;
 
-    var rules = selectorRules[rule.selector]
+    var rules = selectorRules[rule.selector];
 
     for (var i = 0; i < rules.length; ++i) {
-       errorMessage = rules[i](inputElement.value)
-       if (errorMessage) break;
+      switch (inputElement) {
+        case 'radio':
+        case 'checkbox':
+          errorMessage = rules[i](inputElement.value);
+          break;
+        default:
+          errorMessage = rules[i](inputElement.value);
+      }
+      if (errorMessage) break;
     }
 
     if (errorMessage) {
       errorElement.innerText = errorMessage;
-      inputElement.parentElement.classList.add("ivalid");
+      getParent(inputElement, option.formGroupSelector).classList.add("ivalid");
     } else {
       errorElement.innerText = "";
-      inputElement.parentElement.classList.remove("ivalid");
+      getParent(inputElement, option.formGroupSelector).classList.remove(
+        "ivalid"
+      );
     }
 
     return !errorMessage;
   }
   var formElement = document.querySelector(option.form);
   if (formElement) {
-    
     //xử lí khi summit form
-    formElement.onsubmit = function(e) {
+    formElement.onsubmit = function (e) {
       var isFormValid = true;
-      e.preventDefault()
+      e.preventDefault();
 
       option.rules.forEach(function (rule) {
         var inputElement = formElement.querySelector(rule.selector);
-        var isValid = validate(inputElement, rule)
+        var isValid = validate(inputElement, rule);
         if (!isValid) {
-         isFormValid = false;
+          isFormValid = false;
         }
+      });
+      if (isFormValid) {
+        if (typeof option.onSubmit === "function") {
+          var enableInput = document.querySelectorAll("[name]");
+          var formValue = Array.from(enableInput).reduce(function (
+            value,
+            input
+          ) {
+            value[input.name] = input.value;
+            return value;
+          },
+          {});
 
-      })
-      if(isFormValid) {
-        console.log('kgong co loi')
-      } else {
-        console.log('co loi')
+          option.onSubmit(formValue);
+        }
       }
-    }
+    };
 
-
-
-    
     option.rules.forEach(function (rule) {
-
       if (Array.isArray(selectorRules[rule.selector])) {
         selectorRules[rule.selector].push(rule.test);
       } else {
@@ -69,10 +92,14 @@ function Validator(option) {
 
         //xử lí khi user nhập vào input
         inputElement.oninput = function () {
-          var errorElement =
-            inputElement.parentElement.querySelector(".form-message");
+          var errorElement = getParent(
+            inputElement,
+            option.formGroupSelector
+          ).querySelector(".form-message");
           errorElement.innerText = "";
-          inputElement.parentElement.classList.remove("ivalid");
+          getParent(inputElement, option.formGroupSelector).classList.remove(
+            "ivalid"
+          );
         };
       }
     });
@@ -94,7 +121,9 @@ Validator.isEmail = function (selector, message) {
     test: function (value) {
       var regex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
-      return regex.test(value) ? undefined : message || "Vui lòng nhập đúng Email";
+      return regex.test(value)
+        ? undefined
+        : message || "Vui lòng nhập đúng Email";
     },
   };
 };
@@ -114,22 +143,32 @@ Validator.isAgain = function (selector, isAgain, message) {
   return {
     selector: selector,
     test: function (value) {
-      return value === isAgain() ? undefined : message || 'Giá trị nhập lại sai'
+      return value === isAgain()
+        ? undefined
+        : message || "Giá trị nhập lại sai";
     },
   };
 };
 
 Validator({
   form: "#form-1",
+  formGroupSelector: ".form-group",
   rules: [
     Validator.isRequired("#full-name"),
-    Validator.isRequired("#email", 'Vui lòng nhập Email'),
+    Validator.isRequired("#email", "Vui lòng nhập Email"),
     Validator.isEmail("#email"),
-    Validator.isRequired("#password", 'Vui lòng nhập Password'),
+    Validator.isRequired("#password", "Vui lòng nhập Password"),
     Validator.minLength("#password", 6),
-    Validator.isRequired("#ag-password", 'Vui lòng nhập vào giá trị'),
-    Validator.isAgain('#ag-password', function() {
-      return document.querySelector('#form-1 #password').value
-    }, 'Mật khẩu nhập lại không chính xác')
+    Validator.isRequired("#ag-password", "Vui lòng nhập vào giá trị"),
+    Validator.isAgain(
+      "#ag-password",
+      function () {
+        return document.querySelector("#form-1 #password").value;
+      },
+      "Mật khẩu nhập lại không chính xác"
+    ),
   ],
+  onSubmit: function (data) {
+    console.log(data);
+  },
 });

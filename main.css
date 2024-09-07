@@ -26,7 +26,6 @@ body {
   background-color: #fff;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
   border-radius: 5px;
-  
 }
 .login__header {
   text-align: center;
@@ -42,7 +41,7 @@ body {
 }
 
 .contact-form {
-  padding: 0 16px 16px 16px;
+  padding: 0 25px 16px 25px;
 }
 
 .login__label {
