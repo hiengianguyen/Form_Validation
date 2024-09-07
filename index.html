@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./main.css" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div class="login">
+      <div class="login__header">
+        <h3 class="login__tittle">Thành Viên Đăng Ký</h3>
+        <p class="login__content">Cùng nhau xây dựng những thành tựu</p>
+      </div>
+
+      <div class="contact-form">
+        <form action="" id="form-1">
+          <div class="form-group">
+            <label class="login__label" for="full-name">Tên đầy đủ</label>
+            <input class="login__input" name="fullName" id="full-name" type="text" placeholder="VD: Nguyen Van A" />
+            <span class="form-message"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="login__label" for="email">Email</label>
+            <input class="login__input" name="email" id="email" type="email" placeholder="VD: email@domain.com" />
+            <span class="form-message"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="login__label" for="password">Mật Khẩu</label>
+            <input class="login__input" name="password" id="password" type="password" placeholder="Nhập Mật Khẩu" />
+            <span class="form-message"></span>
+          </div>
+
+          <div class="form-group">
+            <label class="login__label" for="ag-password">Nhập Lại Mật Khẩu</label>
+            <input
+              class="login__input" 
+              id="ag-password"
+              name="ag-password"
+              type="password"
+              placeholder="Nhập Lại Mật Khẩu"
+            />
+            <span class="form-message"></span>
+          </div>
+
+          <button class="locgin__btn">Đăng Ký</button>
+        </form>
+      </div>
+    </div>
+    <script src="./validator.js"></script>
+    
+  </body>
+</html>
