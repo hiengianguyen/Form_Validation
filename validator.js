@@ -160,6 +160,8 @@ Validator({
     Validator.isRequired("#password", "Vui lòng nhập Password"),
     Validator.minLength("#password", 6),
     Validator.isRequired("#ag-password", "Vui lòng nhập vào giá trị"),
+    Validator.isRequired("input[name='gender']"),
+
     Validator.isAgain(
       "#ag-password",
       function () {
