@@ -20,10 +20,12 @@ function Validator(option) {
     var rules = selectorRules[rule.selector];
 
     for (var i = 0; i < rules.length; ++i) {
-      switch (inputElement) {
-        case 'radio':
-        case 'checkbox':
-          errorMessage = rules[i](inputElement.value);
+      switch (inputElement.type) {
+        case "radio":
+        case "checkbox":
+          errorMessage = rules[i](
+            formElement.querySelector(rule.selector + ":checked")
+          );
           break;
         default:
           errorMessage = rules[i](inputElement.value);
@@ -64,7 +66,29 @@ function Validator(option) {
             value,
             input
           ) {
-            value[input.name] = input.value;
+            switch (input.type) {
+              case "radio":
+                value[input.name] = formElement.querySelector(
+                  'input[name="' + input.name + '"]:checked'
+                ).value;
+                break;
+              case "checkbox":
+                if (!input.matches(":checked")) {
+                  value[input.name] = "";
+                  return value;
+                }
+                if (!Array.isArray(value[input.name])) {
+                  value[input.name] = [];
+                }
+                value[input.name].push(input.value);
+                break;
+              case "file":
+                value[input.name] = input.files;
+                break;
+              default:
+                value[input.name] = input.value;
+            }
+
             return value;
           },
           {});
@@ -81,8 +105,9 @@ function Validator(option) {
         selectorRules[rule.selector] = [rule.test];
       }
 
-      var inputElement = formElement.querySelector(rule.selector);
-      if (inputElement) {
+      var inputElements = formElement.querySelectorAll(rule.selector);
+
+      Array.from(inputElements).forEach(function (inputElement) {
         // xử lí khi blur khỏi input
         inputElement.onblur = function () {
           //Value: inputElement.value
@@ -101,7 +126,7 @@ function Validator(option) {
             "ivalid"
           );
         };
-      }
+      });
     });
   }
 }
@@ -110,7 +135,7 @@ Validator.isRequired = function (selector, message) {
   return {
     selector: selector,
     test: function (value) {
-      return value.trim() ? undefined : message || "Vui lòng nhập đầy đủ Tên";
+      return value ? undefined : message || "Vui lòng nhập đầy đủ Tên";
     },
   };
 };
@@ -159,11 +184,11 @@ Validator({
     Validator.isEmail("#email"),
     Validator.isRequired("#password", "Vui lòng nhập Password"),
     Validator.minLength("#password", 6),
-    Validator.isRequired("#ag-password", "Vui lòng nhập vào giá trị"),
-    Validator.isRequired("input[name='gender']"),
-
+    Validator.isRequired("#password-confirmation", "Vui lòng nhập vào giá trị"),
+    // Validator.isRequired("#avatar", "Vui lòng chọn file"),
+    // Validator.isRequired("input[name='gender']", "Vui lòng nhập giá trị"),
     Validator.isAgain(
-      "#ag-password",
+      "#password-confirmation",
       function () {
         return document.querySelector("#form-1 #password").value;
       },
@@ -171,6 +196,7 @@ Validator({
     ),
   ],
   onSubmit: function (data) {
+    //handle API
     console.log(data);
   },
 });
